@@ -1,4 +1,4 @@
-use regex::Regex;
+use fancy_regex::Regex;
 use std::env;
 use std::fs;
 
@@ -21,8 +21,8 @@ fn main() {
     // "By accepting &str, collect() can work with both string literals (which are &'static str) and references to existing Strings, utilizing the existing memory location without immediate re-allocation."
 
     // Initalize a sum of 0 and regex (and only refer to it so re always own the Regex.)
-    let _sum: u32 = 0;
-    let re = Regex::new(r"(\d+)\1").unwrap();
+    let mut sum: u64 = 0;
+    let re = Regex::new(r"(?!\1)^(\d+)\1(?!\1)$").unwrap();
 
     for range in ranges {
         let parts: Vec<&str> = range.split("-").collect();
@@ -34,16 +34,24 @@ fn main() {
         let start: u64 = start_str.parse().expect("Expected number.");
         let end: u64 = end_str.parse().expect("Expected number.");
 
-        find_pattern_in_ranges(start, end, &re);
+        // Find matches
+        let matches = find_pattern_in_ranges(start, end, &re);
+        for pattern in matches {
+            sum += pattern;
+        }
     }
+    println!("{sum}");
 }
 
-fn find_pattern_in_ranges(start: u64, end: u64, re: &Regex) {
+fn find_pattern_in_ranges(start: u64, end: u64, re: &Regex) -> Vec<u64> {
+
+    let mut matches: Vec<u64> = Vec::new();
     // Iterate from start to end.
     for num in start..=end {
         // Check if the numbers has repeating patterns. <- will be a function in itself (does_number_have_pattern, using Regex maybe?)
-        if re.is_match(&num.to_string()) {
-            println!("{num}");
+        if re.is_match(&num.to_string()).unwrap() {
+            matches.push(num);
         }
     }
+    return matches;
 }
