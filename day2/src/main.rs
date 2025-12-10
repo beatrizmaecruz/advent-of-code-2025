@@ -1,10 +1,9 @@
+use regex::Regex;
 use std::env;
 use std::fs;
 
 fn main() {
-    // PART 1: File proccessing.
     // Process file into long string.
-
     let args: Vec<String> = env::args().collect();
     let file_path = &args[2];
     let contents: String =
@@ -21,19 +20,30 @@ fn main() {
     // "If collect() accepted owned Strings by value, it would force unnecessary new memory allocations and data copies every time, which is inefficient if the source data is already available as a reference."
     // "By accepting &str, collect() can work with both string literals (which are &'static str) and references to existing Strings, utilizing the existing memory location without immediate re-allocation."
 
-    // Separate each range by dash eg: XX-YY into "XX" and "YY".
+    // Initalize a sum of 0 and regex (and only refer to it so re always own the Regex.)
+    let _sum: u32 = 0;
+    let re = Regex::new(r"(\d+)\1").unwrap();
+
     for range in ranges {
         let parts: Vec<&str> = range.split("-").collect();
 
-        let start: &str = parts[0];
-        let end: &str = parts[1];
+        // Separate each range by dash eg: XX-YY into "XX" and "YY".
+        let start_str: &str = parts[0];
+        let end_str: &str = parts[1];
+        // Convert into workable integers.
+        let start: u64 = start_str.parse().expect("Expected number.");
+        let end: u64 = end_str.parse().expect("Expected number.");
 
-        println!("{start} to {end}");
+        find_pattern_in_ranges(start, end, &re);
     }
+}
 
-    // PART 2: Processing each ID.
-    // Initalize a sum of 0.
-    // Iterate through each range, getting numbers from XX to YY.
-    // Check if the numbers has repeating patterns. <- will be a function in itself (does_number_have_pattern, using Regex maybe?)
-    // If return true, then add the number to sum.
+fn find_pattern_in_ranges(start: u64, end: u64, re: &Regex) {
+    // Iterate from start to end.
+    for num in start..=end {
+        // Check if the numbers has repeating patterns. <- will be a function in itself (does_number_have_pattern, using Regex maybe?)
+        if re.is_match(&num.to_string()) {
+            println!("{num}");
+        }
+    }
 }
