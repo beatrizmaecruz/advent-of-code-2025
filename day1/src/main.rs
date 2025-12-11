@@ -67,7 +67,7 @@ fn main() {
     // Vec<String> is a iterable data type where each element is a line from the input file.
     let rotation_arr: Vec<String> = process_file(args);
 
-    let mut current_dial: i32 = 50; // Dial starts at 50. Note we use u8 as dial can be 0 - 99 and u8's range is 0 - 255.
+    let mut current_dial: i32 = 0; // Dial starts at 50. Note we use u8 as dial can be 0 - 99 and u8's range is 0 - 255.
     let mut zero_counts: u32 = 0;
     let mut zero_passes: i32;
 
@@ -78,6 +78,7 @@ fn main() {
         if current_dial == 0 {
             zero_counts += 1;
         }
+
         zero_counts += zero_passes as u32;
         // Afterwards, we need to process every dial and get the result back.
         // If the result is the dial being 0, we need need to increment zero_counts.
@@ -114,7 +115,7 @@ fn rotate(instruction: &String, current_dial: i32) -> (i32, i32) {
 
     // Apply this to actual dial.
     let new_dial: i32;
-    let zero_passes: i32;
+    let mut zero_passes: i32;
 
     if is_right {
         new_dial = (current_dial as i32 + distance as i32).rem_euclid(modulus);
@@ -125,6 +126,14 @@ fn rotate(instruction: &String, current_dial: i32) -> (i32, i32) {
             .div_euclid(modulus)
             .abs();
     }
+
+    if new_dial == 0 && !is_right {
+        zero_passes -= 1
+    }
+
+    // assert_eq!((current_dial as i32 + distance as i32).div_euclid(modulus), 1);
+
+    println!("Moving {instruction} from {current_dial} to {new_dial}, with {zero_passes} passes over 0.");
 
     return (new_dial, zero_passes);
 }
