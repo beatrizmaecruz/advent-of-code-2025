@@ -13,13 +13,33 @@ fn main() {
     // Note: Because to_string is binding. If we do .split().collect() after, there is nothing that can own the original long String so we can't reference to it.
     // Hence why we need contents (owner of original value) and content_lines (reference to contents) as SEPARATE values.
     let content_lines: Vec<&str> = contents.split("\n").collect();
- 
-    // for line in content_lines {
-        
-    // }
+    let mut sum = 0;
 
+    for line in content_lines {
+        let max_digit = find_max_two_digit_num(line);
+        sum += max_digit;
+    }
+    println!("{sum}");
 }
 
-// find_max_two_digit_num(bank: &str) -> u32 {
+fn find_max_two_digit_num(bank: &str) -> u32 {
+    let integers: Vec<u32> = bank
+    .chars()
+    .filter_map(|c| c.to_digit(10))
+    .collect();
 
-// }
+    // Getting first digit of max digit (which will be maximum digit from first element to second to last)
+    let mut max_index = 0;
+    for (idx, &value) in integers[0..=integers.len()-2].iter().enumerate() {
+        if value > integers[max_index] {
+            max_index = idx;
+        }
+    }
+    let first_digit = integers[max_index];
+
+    // Getting second digit of max digit.
+    let second_digit_slice: &[u32] = &integers[max_index+1..];
+    let second_digit: &u32 = second_digit_slice.iter().max().unwrap();
+
+    return (first_digit*10) + second_digit;
+}
